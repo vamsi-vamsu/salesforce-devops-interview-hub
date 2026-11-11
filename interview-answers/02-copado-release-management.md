@@ -187,3 +187,96 @@ A release train is a planned cadence for grouping and delivering changes on a pr
 ## Q: What are common limitations or risks to consider when using Copado?
 
 Copado does not remove the need for sound Git practices, dependency management or release governance. Teams still need to manage metadata conflicts, branch drift, environment differences, credentials, test failures and data dependencies. Some behaviors and features differ between Metadata Pipeline and Source Format Pipeline or by package version. I verify the pipeline type and installed version before relying on a specific feature.
+
+
+## Q: Explain the different environments in your Copado pipeline.
+
+I describe the environments by their purpose and the promotion path rather than only listing org names. A typical lifecycle is Development, Integration or SIT, QA, UAT, Staging and Production. Developers commit changes through User Stories, the release team promotes the approved scope through validation and testing environments, business users complete UAT, and the production deployment is controlled by approvals and a release window. In my Copado implementation, the confirmed scope included four production Salesforce orgs and promotion paths through SIT, UAT and Production. I would map the exact development and intermediate org names to the specific project rather than assume every org follows an identical path.
+
+## Q: When do you use back promotion in Copado?
+
+I use back promotion after changes have moved to a higher environment and need to be synchronized into lower environments. The common examples are a production hotfix, a change promoted to UAT or Production that developers also need in their development branches, or a release change that would otherwise be missing from the next development cycle. This keeps branches aligned and prevents a later promotion from reintroducing an older version. Before back-promoting, I check story eligibility, dependencies, branch state and whether developers have uncommitted work.
+
+## Q: Which orgs do you perform back promotions to?
+
+I select destinations based on the pipeline's promotion path and where active development is taking place. A production fix generally needs to flow back through the relevant lower stages so that integration, QA and development do not remain on an older version. I do not assume every org should receive every back promotion. I check the story's origin, the environments it has already reached, intermediate stage requirements and whether the destination contains work in progress.
+
+## Q: Are all three development orgs being used properly?
+
+I would assess each development org against its intended role rather than say yes without checking usage. I would review active developers and squads, open User Stories, recent commits, refresh dates, branch alignment, org storage, integration dependencies and whether multiple teams are making changes in the same org. If an org is idle or duplicating another environment's purpose, I would recommend consolidating usage or assigning it a clear role. The exact number and utilization of development orgs must be confirmed from the actual project environment inventory before quoting it in an interview.
+
+## Q: Which Salesforce metadata components are eligible for selective commit in Copado?
+
+Selective commit is based on the metadata changes retrieved or selected for the User Story, subject to the metadata types supported by the installed Copado version and the configured pipeline. Typical examples include Apex classes and triggers, objects and fields, validation rules, layouts, permission sets, profiles, Flows, Lightning components and other supported metadata. I review the User Story metadata list and Git diff to confirm that the intended components and dependencies are included and unrelated changes are excluded. I avoid claiming that every Salesforce metadata type is supported identically.
+
+## Q: Which quality gates do you use in your Copado pipeline?
+
+The quality controls I discuss are peer review and approval, Apex PMD static analysis, Apex test execution and deployment validation. These controls serve different purposes: peer review checks the change, PMD checks code quality and potential coding issues, Apex tests check functional behavior, and validation checks whether the metadata can be deployed to the target org. The exact point where each gate runs depends on the configured pipeline stage and extension. I distinguish the gates actually configured in the project from additional controls I would recommend.
+
+## Q: How does the PMD quality gate work?
+
+PMD analyzes Apex source code against a configured ruleset. The pipeline checks out the source, runs the PMD scanner against the changed or configured Apex scope, and produces findings that identify the file, line, rule and severity or priority. The quality gate evaluates those findings against the team's policy, such as failing on selected high-priority issues or preventing new violations. I review the report, fix or formally disposition the findings, and rerun the scan. PMD is a static analysis check; it does not replace Apex tests or deployment validation.
+
+## Q: What is the current PMD score, including critical, major, medium and low issues?
+
+I would give the current numbers only after checking the latest successful PMD report for the relevant branch or release. The report should be filtered to the same scope and date, and the severity categories should match the team's configured mapping. I would not quote an old count as the current status. In an interview, I would say: "I review the latest PMD report as part of release readiness. I can provide the current count by severity from the latest pipeline report; I don't want to give you an unverified number."
+
+## Q: How are PMD rules tracked when you configure them?
+
+I keep the PMD ruleset and scanner configuration in version control alongside the pipeline definition. This makes rule changes reviewable through pull requests and ensures the same rules are applied consistently across branches and environments. I also pin or document the PMD version, review rule changes with the team, and retain scan reports as pipeline artifacts or in the agreed reporting location. A rule change should have a clear owner and change history rather than being edited only on an individual build agent.
+
+## Q: Have you implemented custom PMD rules?
+
+I distinguish standard PMD rules from custom rules. Standard rules are selected and configured through the ruleset. A custom PMD rule requires additional implementation, testing and maintenance, so I would only claim it if I can identify the rule, its purpose and where its code is maintained. If the project uses a configured standard ruleset without custom rule classes, I would say that clearly rather than describe configuration as custom rule development.
+
+## Q: What Apex test coverage threshold have you configured?
+
+I verify the threshold from the actual Copado environment settings and the project's release policy before quoting a number. Salesforce's production deployment requirement is generally at least 75% overall Apex code coverage, with every trigger having some coverage, but a project can set a higher internal quality threshold. I explain the difference between Salesforce's deployment minimum and the project's configured gate. I do not assume the internal threshold is 75% unless I have checked the configuration.
+
+## Q: What is the overall Apex test coverage in Production?
+
+I use the current production org's Apex code coverage results rather than a value from a sandbox or an old deployment report. For a multi-org implementation, I check each production org separately because coverage can differ by org. I also explain that overall org coverage and the coverage calculated for a particular deployment are not interchangeable. I would confirm the latest figures in Setup or the deployment/reporting process before quoting them.
+
+## Q: How many environments are automated and which are manual?
+
+I classify each transition separately. A stage can have automated validation and testing but still require a person to approve or trigger the deployment. I document the source, destination, trigger, automated checks, approval requirement and deployment owner for each transition. For my Copado project, I describe the configured promotion and approval flow, but I confirm the exact count of automated versus manually triggered transitions from the current pipeline configuration instead of inventing a number.
+
+## Q: What is your conflict-resolution strategy during deployment?
+
+I first identify whether the issue is a commit conflict, promotion-branch conflict or deployment-time conflict. I inspect the affected metadata and compare the source, promotion and destination versions. For supported nested metadata, I use the configured semantic merge behavior. For Apex and other programmatic files where whole-file replacement could lose another developer's changes, I prefer manual review and resolution. I also check merge order, User Story scope and whether the destination branch changed after the promotion branch was created. After resolving the issue, I validate and test the combined result.
+
+## Q: Which components do you exclude from automatic conflict resolution?
+
+I exclude programmatic or whole-file components where an automatic source override could silently discard another developer's work. Examples can include Apex classes, triggers, Visualforce, LWC and Aura files, depending on the pipeline's merge behavior. In a Source Format Pipeline, the repository's .copado_exclude_autoresolve file can identify paths or patterns that require manual resolution. I do not automatically exclude every declarative type; supported semantic merge can preserve nested changes in metadata such as permission sets or profiles. The final list must match the team's actual repository configuration.
+
+## Q: What are the advantages and disadvantages of Copado based on your experience?
+
+Copado provides Salesforce-focused release management, User Story traceability, environment promotion paths, approvals, quality gates, conflict-management capabilities and integrations with tools such as Git and Jira. It helps standardize deployments and gives release teams visibility into what is moving between environments. The trade-offs are platform learning curve, configuration and administration overhead, dependency and conflict complexity, and the need to understand how Copado's workflow interacts with Git. It does not remove the need for sound branching, code review, testing and release governance.
+
+## Q: Have you worked with Copado Essentials?
+
+My hands-on experience has been with Copado release management and pipeline implementation. I would distinguish that from Copado Essentials and avoid claiming direct Essentials experience unless I have used that specific product. I understand the general Salesforce deployment concepts, but I would want to confirm the Essentials feature set and workflow for the version being used before describing implementation details.
+
+## Q: How would you implement Copado from scratch compared with introducing it into a live Salesforce project?
+
+For a greenfield implementation, I start with org and environment discovery, Git strategy, branching and promotion paths, credentials, user roles, User Story standards, integrations, quality gates, deployment steps and release governance. I then configure a lower-environment proof of concept, test representative metadata and dependencies, onboard teams, and roll out the production path with runbooks and support. In a live project, I first assess existing orgs, repositories, branches, release practices, metadata quality, open work and deployment risks. I map the current process, agree a migration and coexistence plan, pilot a small release, reconcile in-flight changes and cut over in controlled stages.
+
+## Q: How long does a Copado implementation take from scratch versus in a live project?
+
+I treat this as a planning estimate, not a fixed product delivery time. A relatively contained greenfield setup may take around 4 to 6 weeks, while a live-project adoption may take around 6 to 10 weeks because it includes discovery, branch and metadata assessment, migration planning, parallel-process management and release cutover. Complex multi-org landscapes, integrations, governance approvals and poor metadata hygiene can extend either estimate. I break the estimate into discovery, design, configuration, pilot, team onboarding and production rollout, then refine it after assessing the actual environment.
+
+## Q: How do you resolve deployment or validation issues during a release?
+
+I start with the first meaningful error in the Copado job or Salesforce deployment result and classify it: metadata dependency, missing component, conflict, Apex test failure, permissions, authentication, data step or environment configuration. I inspect the affected component and compare the source and target state. I correct the issue in the source-controlled process, update the User Story or dependency sequence if needed, and rerun validation before the actual deployment. I communicate the release impact and avoid repeated retries or bypassing quality gates without understanding the cause.
+
+## Q: How do you roll back a User Story after it has already been promoted to Production?
+
+I first establish whether the story is isolated and whether later stories depend on its components. I review the User Story's committed metadata and Git history to identify the exact changes. If the change is safe to reverse, I create a controlled revert or corrective User Story through the normal source-control and Copado promotion process, validate it in lower environments, run regression tests and deploy with the required approval. I also synchronize the correction through lower environments. I avoid manually deleting components in Production without reconciling Git, because a later promotion could reintroduce the original change.
+
+## Q: How does Copado track which metadata components belong to a User Story?
+
+Copado associates selected or retrieved metadata with the User Story and its feature branch and Git commits. The User Story metadata selection and commit history provide traceability into the change scope. Before promotion, I review the metadata list and Git diff to confirm the intended components and dependencies are included and unrelated changes are excluded. For example, a story might include a custom field, validation rule and permission set. I verify the final promotion contents rather than assuming the User Story title alone defines the deployed scope.
+
+## Q: What is the difference between Copado and Copado Essentials?
+
+I would compare the exact product capabilities and licensing available in the customer's environment before giving a detailed feature-by-feature answer. My experience is with Copado release management and pipeline implementation. I would not assume that Essentials provides the same configuration, automation, governance or integration capabilities as the full Copado platform. For a project decision, I would map the required lifecycle, org topology, approvals, quality gates and integrations against the current Essentials offering.
