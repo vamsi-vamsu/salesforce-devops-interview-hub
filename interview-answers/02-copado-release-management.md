@@ -82,3 +82,19 @@ _Sample answer to be completed. Prepare this using the project context, technica
 
 _Sample answer to be completed. Prepare this using the project context, technical decisions, troubleshooting steps and outcomes relevant to the question. Do not claim experience that you have not personally had._
 
+
+## Q: How do you manage a release containing changes from many teams?
+
+I manage the release through an approved scope rather than treating every completed User Story as automatically ready for production. I track each story's owner, business approval, test status, dependencies, target release and deployment order. I group related changes into logical batches and confirm that each batch has passed the required validation and quality gates. If a story is not ready, I assess its dependencies and defer it without removing metadata that other approved changes require.
+
+## Q: How do you manage weekly fast-track releases alongside a regular release cycle?
+
+I maintain a release calendar with clear cutoffs, testing windows, approval checkpoints and deployment ownership. Fast-track changes are kept small and limited to approved, time-sensitive work. The regular release carries the broader scope that has completed the agreed QA and UAT process. I make sure both tracks use the same production controls, and any emergency exception is documented and approved.
+
+## Q: What should a production release runbook contain?
+
+It should contain the release identifier, approved scope, related User Stories, deployment order, target org, owners, approvals, validation results, pre-deployment tasks and execution steps. I also include post-deployment smoke tests, rollback criteria, recovery steps, escalation contacts and communication checkpoints. After the release, I record the outcome, issues, verification results and follow-up actions.
+
+## Q: How do you manage a release when one User Story fails validation?
+
+I first determine whether the failure is isolated or whether other stories depend on the affected metadata. If it is independent, I can recommend deferring that story through the release governance process while proceeding with the remaining approved scope. If other changes depend on it, I reassess the deployment sequence and identify what else must be deferred. I update the release scope and communicate the decision before continuing.
