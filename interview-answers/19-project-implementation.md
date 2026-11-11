@@ -63,9 +63,20 @@ The implementation uses protected GitLab CI/CD variables together with Google Cl
 
 The package build and deployment process uses dependency-aware parallelism for independent packages while preserving the required order for dependent packages. This reduced the staging execution time from approximately five hours to two to three hours. The implementation also provides consistent merge-request validation, package traceability, automated notifications and controlled production deployment.
 
-## Q: How would you describe a Gearset implementation in an interview?
+## Q: Explain your Gearset release process from development to production.
 
-Use this section to document the actual Gearset implementation before claiming hands-on experience. Cover the Salesforce orgs connected, source-control integration, environments and branch strategy, deployment pipelines, validation and test steps, approvals, production release controls, rollback or recovery approach, and measurable outcomes. Distinguish features evaluated or used from features personally configured.
+I have experience working with Gearset for Salesforce release management. The process starts with developers committing changes to the agreed Git branches and raising pull requests for review. I use Gearset to compare source and target metadata, identify dependencies and validate the changes against the target Salesforce environment. After code review and the required validation, approved changes move through the release environments, such as QA and UAT, before production. I verify deployment results, coordinate smoke testing with QA or business owners, check critical automation and integrations, and communicate the release outcome.
+
+The exact org count, branch names, CI job configuration, number of deployment pipelines, approval model and release cadence should be documented from the actual Gearset setup before quoting them. I do not use a guessed pipeline count or assume that every Gearset feature was configured.
+
+## Q: What are the key parts of your Gearset release process?
+
+The key parts are source-control integration, source and target environment configuration, metadata comparison, dependency review, pull-request validation, approvals, controlled promotion, production deployment and post-deployment verification. The release process also needs a clear owner, release scope, deployment order, runbook and recovery plan. I use the team's actual configuration when explaining which steps are automated and which require manual approval.
+
+## Q: How do you handle rollback and emergency changes in Gearset?
+
+I assess the production impact and identify the exact metadata changes involved. I decide whether a targeted rollback is safe or whether a forward fix is better, especially if data changes or dependent components are involved. I use Git as the source of truth, prepare a reviewed corrective change, validate it and deploy through the controlled release process. After an emergency production change, I reconcile it into the production and active development branches so it is not overwritten by a later release.
+
 
 ## Q: How would you describe a GitHub Actions implementation in an interview?
 
