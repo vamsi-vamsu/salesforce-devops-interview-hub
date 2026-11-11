@@ -1,29 +1,64 @@
 # Salesforce DevOps Interview Hub
 
-A static, responsive interview-preparation knowledge base with 251 questions across 18 categories.
+A searchable, responsive interview preparation site. The interview question bank and sample answers are maintained as Markdown files in `interview-answers/`. The website reads those Markdown files directly, so the Markdown documents are the single source of truth.
 
-## Features
-- Search across questions and categories
-- Filter by preparation status
+## Edit locally on your Mac
+
+1. Install [Git](https://git-scm.com/downloads) and [Visual Studio Code](https://code.visualstudio.com/).
+2. Clone this repository:
+
+   ```bash
+   git clone https://github.com/vamsi-vamsu/salesforce-devops-interview-hub.git
+   cd salesforce-devops-interview-hub
+   code .
+   ```
+
+3. Open a file under `interview-answers/` and edit the questions or answers using Markdown.
+4. Save, preview Markdown in VS Code with **Cmd+Shift+V**, then commit and push:
+
+   ```bash
+   git add interview-answers/
+   git commit -m "Update interview preparation answers"
+   git push
+   ```
+
+GitHub Pages will publish the updated site after the commit is pushed.
+
+## Markdown format
+
+Each category has its own file. Use `#` for the category heading and `## Q: ` for each question. Put the sample answer directly below the question. You can use normal Markdown headings, paragraphs, bullet lists, numbered steps and code fences.
+
+Example:
+
+```markdown
+# GitLab CI/CD
+
+## Q: Explain your GitLab CI/CD architecture.
+
+We use two long-lived branches: Develop and main.
+
+### Pipeline stages
+
+1. Security
+2. Deploy
+3. Test
+4. Review
+
+## Q: How do you handle snapshot failures?
+
+The pipeline falls back to regular scratch-org creation when the nightly snapshot is unavailable.
+```
+
+## Website features
+
+- Search and category filters
 - Expand/collapse question cards
-- Draft answer notes for each question
-- Preparation status and notes saved in the current browser using localStorage
-- Responsive professional documentation-style layout
+- Prepared / Needs practice status tracking
+- Personal notes stored in the current browser using localStorage
+- Responsive layout
 
-## Privacy
-The site is intended to be public. Anyone who can access the published site can read its question bank.
-Question status and draft answers are stored locally in the visitor's browser and are not sent to GitHub or shared with other visitors. Do not put sensitive personal information in a public repository.
+Personal notes and preparation status are browser-local. They are not synced to GitHub. The question bank and sample answers are public because this repository and its GitHub Pages site are public.
 
-## Publish with GitHub Pages
-1. Create a GitHub repository named `salesforce-devops-interview-hub`.
-2. Upload `index.html` and this `README.md` to the repository root.
-3. Open **Settings → Pages**.
-4. Under **Build and deployment**, select **Deploy from a branch**.
-5. Select branch `main` and folder `/ (root)`, then save.
-6. Wait for GitHub Pages to publish. The site URL will look like:
-   `https://YOUR-GITHUB-USERNAME.github.io/salesforce-devops-interview-hub/`
+## Content structure
 
-GitHub Pages is free for public repositories. Publishing is not automatic from this ZIP; the files must be uploaded to your GitHub repository and Pages enabled.
-
-## Customize
-All question data is embedded near the bottom of `index.html` in the `DATA` array. Edit the categories and questions there.
+All interview questions and sample answers live in `interview-answers/*.md`. The website loads those files at runtime. Do not edit the old `answers.js` file; Markdown is now the source of truth.
