@@ -1,10 +1,12 @@
 # GitLab CI/CD
 
+> **Project context:** The GitLab project supported a similar scale of User Stories and approximately 20-25 production releases annually. The staging pipeline was optimized to reduce execution time. Do not quote an exact staging-time reduction unless you have a verified figure.
+
 > Interview preparation notes. Answers distinguish documented implementation experience from conceptual knowledge. Topics outside direct project experience are framed as an approach rather than claimed hands-on delivery.
 
 ## Q: Explain your GitLab CI/CD architecture.
 
-We use two long-lived branches: Develop and main. Developers create feature branches from Develop and open merge requests back to Develop. The MR pipeline has Security, Deploy, Test and Review stages. It creates a scratch org from the nightly snapshot, deploys metadata and dependencies in reference order, runs Apex tests and provides QA access to the scratch org. The MR title can contain skip-snapshot to use a regular scratch org; the pipeline also falls back to regular scratch-org creation if the nightly snapshot is unavailable. Failures trigger Google Chat notifications. Once merged to Develop, the QA pipeline builds and deploys the changed packages sequentially. For the biweekly release, we cut a release branch from Develop, raise an MR to main and manually run staging with package_list=all. It reuses the latest coverage-enabled package version or creates one, then builds/deploys packages with dependency-aware parallelism. Package IDs are published in GitLab Wiki, Google Chat sends status notifications and sfdx-project.json is updated. The production pipeline is manually run with the approved package names and IDs, followed by post-deployment validation and business-owner communication.
+We use two long-lived branches: Develop and main. Developers create feature branches from Develop and open merge requests back to Develop. The MR pipeline has Security, Deploy, Test and Review stages. It creates a scratch org from the nightly snapshot, deploys metadata and dependencies in reference order, runs Apex tests and provides QA access to the scratch org. The MR title can contain skip-snapshot to use a regular scratch org; the pipeline also falls back to regular scratch-org creation if the nightly snapshot is unavailable. Failures trigger Google Chat notifications. Once merged to Develop, the QA pipeline builds and deploys the changed packages sequentially. For the biweekly release, we cut a release branch from Develop, raise an MR to main and manually run staging with package_list=all. It reuses the latest coverage-enabled package version or creates one, then builds/deploys packages with dependency-aware parallelism. Package IDs are published in GitLab Wiki, Google Chat sends status notifications and sfdx-project.json is updated. The production pipeline is manually run with the approved package names and IDs, followed by post-deployment validation and business-owner communication. The project supported approximately 20-25 production releases annually, with a similar User Story volume to the Copado/Gearset program. We also reduced staging pipeline execution time through package reuse and dependency-aware parallel execution.
 
 ## Q: What are GitLab stages and jobs?
 
@@ -95,3 +97,8 @@ The PMD scan output is reviewed as part of code quality checks, and scheduled Ap
 ## Q: How do you decide whether a PMD finding should block a merge?
 
 I use the team's agreed severity and quality policy rather than treating every finding identically. High-risk findings can be configured to fail the pipeline, while lower-priority findings can be reported for review and remediation. I consider whether the finding is new or pre-existing, the affected code path and the risk of the change. The exact blocking threshold must match the PMD ruleset and pipeline configuration; I do not quote a severity threshold unless I have verified it.
+
+
+## Q: How do you roll back a GitLab Salesforce package deployment?
+
+For the GitLab 2GP process, I do not treat rollback as a Copado-style selective component rollback. I identify the commit or source change that introduced the issue and revert that commit in Git. Then I run the pipeline to build and install new package versions containing the corrected source. I validate the package dependencies, installation order and target org after deployment. This creates a new package version representing the corrected state rather than attempting to uninstall or overwrite an already-installed package version in place.
