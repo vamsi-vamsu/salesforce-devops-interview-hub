@@ -6,24 +6,23 @@ A searchable, responsive interview preparation site. The interview question bank
 
 The website includes a **Repository Guide** category with step-by-step instructions for editing existing answers, adding questions or categories, and publishing changes. Read `interview-answers/00-repository-guide.md` before making structural changes.
 
-## Project implementation
+## Website structure
 
-The final category, **Project Implementation**, documents end-to-end implementation stories for Copado, GitLab CI/CD, Gearset, GitHub Actions and Azure DevOps. It distinguishes verified hands-on experience from topics that still need project-specific details.
+The navigation has two main sections:
 
-## New interview categories
+- **Interview Q&A:** General Salesforce, technical, security, architecture, testing, data, leadership and behavioral topics.
+- **Project Implementation:** Platform-specific implementation and release-management content grouped into subfolders.
 
-- **Gearset Release Management:** Gearset CI jobs, Git integration, release planning, deployment validation, production recovery and release governance.
-- **Salesforce Development & Integrations:** Apex, triggers, LWC, REST/SOAP APIs, asynchronous processing, data volume, testing and security.
+### Project Implementation folders
 
-The Gearset category is based on the provided reference material and the user's confirmation of Gearset experience. Verify any environment-specific details, pipeline counts, integrations and metrics against the actual implementation before using them in an interview.
+- **Copado:** Release Management, Source Format Pipelines, AI & Release Optimization.
+- **Gearset:** Release Management.
+- **GitLab CI/CD:** Pipeline design and implementation.
+- **GitHub Actions:** Workflow and deployment topics.
+- **Azure DevOps:** Reserved for Azure Pipelines and Salesforce deployment Q&A as topics are added.
+- The Project Implementation overview is in `interview-answers/project-implementation/README.md`.
 
-## Copado interview categories
-
-- **Copado & Release Management:** Core concepts, credentials, User Stories, releases, approvals, integrations, data deployment and release governance.
-- **Copado Source Format Pipelines:** Environment configuration, merge behavior, conflict resolution, Environment Sync, back promotions, Clean Pull Requests, EnVars, data commits and quality gates.
-- **Copado AI & Release Optimization:** Scenario-based recommendations for conflict prevention, release-window improvement, quality gates, back-promotion strategy and troubleshooting. These are proposed approaches, not claims that every recommendation was implemented.
-
-The Copado Source Format category follows the supplied technical reference. Confirm product-version-specific behavior in the installed Copado version. Keep Copado and GitLab project experiences separate.
+The sidebar groups platform content under Project Implementation. Search and preparation tracking continue to work across all categories.
 
 ## Edit locally on your Mac
 
@@ -49,7 +48,7 @@ GitHub Pages will publish the updated site after the commit is pushed.
 
 ## Markdown format
 
-Each category has its own file. Use `#` for the category heading and `## Q: ` for each question. Put the sample answer directly below the question. You can use normal Markdown headings, paragraphs, bullet lists, numbered steps and code fences.
+Each category has its own Markdown file. Platform-specific files are stored under `interview-answers/project-implementation/<platform>/`. Use `#` for the category heading and `## Q: ` for each question. Put the sample answer directly below the question. You can use normal Markdown headings, paragraphs, bullet lists, numbered steps and code fences.
 
 Example:
 
