@@ -98,3 +98,92 @@ It should contain the release identifier, approved scope, related User Stories, 
 ## Q: How do you manage a release when one User Story fails validation?
 
 I first determine whether the failure is isolated or whether other stories depend on the affected metadata. If it is independent, I can recommend deferring that story through the release governance process while proceeding with the remaining approved scope. If other changes depend on it, I reassess the deployment sequence and identify what else must be deferred. I update the release scope and communicate the decision before continuing.
+
+
+## Q: What is a Copado credential?
+
+A credential connects Copado to a Salesforce environment using an authenticated Salesforce user. The access available through that credential is based on the permissions of the user who authenticated it. I use a dedicated integration user with only the permissions needed for the deployment activities and verify the credential against the intended org before running a promotion.
+
+## Q: What is the difference between a source environment and a destination environment?
+
+The source environment is where the changes being promoted originate, and the destination environment is where those changes are intended to be deployed. For example, when moving a User Story from a development org to UAT, development is the source and UAT is the destination. The distinction matters when checking branch state, credentials, deployment permissions and environment-specific configuration.
+
+## Q: What is a Copado commit?
+
+A commit associates selected metadata changes with a User Story and records those changes in the Git repository. The committed changes can then be promoted through the pipeline. I review the metadata included in a commit carefully so that unrelated or incomplete work is not added to the User Story.
+
+## Q: What is a Copado release?
+
+A release groups User Stories that are intended to move through the release process together and provides a way to track the version of changes delivered through a deployment. I use the release scope to coordinate readiness, approvals, testing and production deployment rather than treating each User Story as an isolated production event.
+
+## Q: What is the difference between a User Story and a release?
+
+A User Story represents an individual unit of development work and contains its committed changes. A release groups multiple User Stories that are planned to be delivered together. The User Story provides traceability at the change level, while the release provides coordination and tracking at the broader delivery level.
+
+## Q: What is the difference between a parent and child User Story?
+
+A parent User Story can group or coordinate related child User Stories when work is split into smaller units. Child stories can represent separate development tasks or components that contribute to the broader requirement. The exact relationship and promotion behavior should be confirmed against the team's Copado configuration. I make sure dependencies and deployment scope are clear before promoting related stories.
+
+## Q: What is a Copado User Story template?
+
+A User Story template provides a reusable starting structure for creating stories. It can help standardize fields, required information and the way teams capture development work. I would align templates with the team's work-item process so developers consistently provide acceptance criteria, change details, testing information and traceability. Exact template fields depend on the configuration.
+
+## Q: What is the purpose of Copado Impact Analysis?
+
+Impact Analysis helps teams understand which Salesforce components or areas may be affected by a proposed change. It supports dependency and risk assessment before deployment. I use impact information as an input to release planning and testing, but I still validate the actual metadata dependencies and behavior in the target environment.
+
+## Q: What is Copado Compliance Hub?
+
+Compliance Hub is a Copado capability intended to help teams apply governance and compliance controls to their development and release process. It can support policy checks and visibility into whether required standards are being followed. The exact rules, integrations and enforcement points depend on the product edition and configuration, so I would verify the capabilities enabled in the target implementation before describing a specific control as active.
+
+## Q: What is Copado Data Deploy?
+
+Data Deploy supports moving selected Salesforce data records between environments as part of a controlled deployment process. Data deployment requires attention to record relationships, external IDs, ordering and dependencies between records. I validate the data template and execution sequence in a lower environment, review record-level results and confirm that the target data is correct after deployment.
+
+## Q: How is data deployment different from metadata deployment?
+
+Metadata deployment moves Salesforce configuration and application components, such as objects, fields, Apex and Flows. Data deployment moves records stored in Salesforce objects. Metadata dependencies are not the same as record dependencies, so data migration requires careful relationship handling, record matching and deployment order. I plan and validate both separately even when they are coordinated in one release.
+
+## Q: What is the purpose of Copado Test Data Management?
+
+Test Data Management helps teams prepare and manage representative data for testing. It can support consistent test execution across environments while reducing the effort of manually preparing records. I would confirm the specific module capabilities and data policies in the installed Copado version, especially around masking, record relationships and sensitive information.
+
+## Q: What is the purpose of Copado Data Masking?
+
+Data masking protects sensitive information when production-like data is used outside production. It replaces or obfuscates selected values so teams can test with useful data while reducing exposure of personal or confidential information. I define the masking policy around data classification and regulatory requirements, then verify that relationships and test scenarios remain usable after masking.
+
+## Q: What is the difference between Deploy All and Deploy Outstanding?
+
+These options determine the scope of metadata selected for a deployment. Deploy All generally includes the full selected deployment scope, while Deploy Outstanding focuses on changes that have not yet been deployed to the destination. The precise behavior can depend on the Copado pipeline type and deployment configuration, so I verify the component list and deployment preview before executing either option.
+
+## Q: How do you manage deployment approvals in Copado?
+
+I align approvals with the release governance process and the risk of the target environment. Development and lower-environment promotions can use lighter controls, while production should require the defined peer reviews, quality checks and authorized business or change approvals. I verify that approval status is recorded before deployment and retain the release evidence for audit and troubleshooting.
+
+## Q: How do you manage deployment permissions in Copado?
+
+I use role-based access and least privilege. Developers should have the permissions needed to create and commit User Stories, while promotion and production deployment permissions should be restricted to the appropriate release roles. I review the Salesforce permissions of the users behind Copado credentials as well, because the credential inherits the access of its authenticated user.
+
+## Q: How do you integrate Copado with Jira?
+
+I use the supported Jira integration and map the relevant work items so that Copado User Stories can be associated with the corresponding Jira issue. This provides traceability between the business request, development work and deployment. I verify the integration user permissions, field mapping and synchronization behavior, and I avoid assuming every Jira field is synchronized unless it is configured.
+
+## Q: How do you integrate Copado with Jenkins or another CI server?
+
+I first identify which responsibility belongs to Copado and which belongs to the external CI server. The integration should use supported authentication and trigger mechanisms, pass only the required parameters and report execution results back to the release process. I validate the connection with a non-production job and document ownership, failure handling and secret management. The exact setup depends on the Copado product version and the CI integration being used.
+
+## Q: What is the difference between a manual and automated deployment in Copado?
+
+A manual deployment is initiated and controlled by a user at the required point in the release process. An automated deployment is triggered by configured pipeline rules or workflow events after the required conditions are met. Automation improves consistency and reduces repetitive work, but it should still enforce the required approvals, validation, testing and production access controls.
+
+## Q: What should a Copado deployment checklist include?
+
+I include the approved User Story and release scope, source and destination environments, dependencies, merge order, pull-request reviews, quality-gate results, Apex test requirements, approvals and deployment window. I also confirm credentials, environment-specific settings, data steps, post-deployment tasks, smoke tests, owners and recovery steps. The checklist should reflect the team's actual pipeline configuration.
+
+## Q: What is a Copado release train?
+
+A release train is a planned cadence for grouping and delivering changes on a predictable schedule. Teams align story cutoffs, development completion, QA, UAT, approvals and production deployment around the release calendar. It helps multiple squads coordinate delivery while maintaining clear scope and readiness criteria.
+
+## Q: What are common limitations or risks to consider when using Copado?
+
+Copado does not remove the need for sound Git practices, dependency management or release governance. Teams still need to manage metadata conflicts, branch drift, environment differences, credentials, test failures and data dependencies. Some behaviors and features differ between Metadata Pipeline and Source Format Pipeline or by package version. I verify the pipeline type and installed version before relying on a specific feature.
