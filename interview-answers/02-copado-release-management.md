@@ -1,6 +1,6 @@
 # Copado & Release Management
 
-> Interview preparation notes. Answers reflect the experience and implementation details shared by Vamsi. Where a topic is outside direct project experience, the answer is framed as conceptual knowledge or an approach rather than claimed hands-on delivery.
+> Interview preparation notes. Answers distinguish documented implementation experience from conceptual knowledge. Topics outside direct project experience are framed as an approach rather than claimed hands-on delivery.
 
 ## Q: Explain the Copado release management process.
 
