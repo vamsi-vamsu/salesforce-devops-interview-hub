@@ -10,6 +10,13 @@ The website includes a **Repository Guide** category with step-by-step instructi
 
 The final category, **Project Implementation**, documents end-to-end implementation stories for Copado, GitLab CI/CD, Gearset, GitHub Actions and Azure DevOps. It distinguishes verified hands-on experience from topics that still need project-specific details.
 
+## New interview categories
+
+- **Gearset Release Management:** Gearset CI jobs, Git integration, release planning, deployment validation, production recovery and release governance.
+- **Salesforce Development & Integrations:** Apex, triggers, LWC, REST/SOAP APIs, asynchronous processing, data volume, testing and security.
+
+The Gearset category is based on the provided reference material and the user's confirmation of Gearset experience. Verify any environment-specific details, pipeline counts, integrations and metrics against the actual implementation before using them in an interview.
+
 ## Edit locally on your Mac
 
 1. Install [Git](https://git-scm.com/downloads) and [Visual Studio Code](https://code.visualstudio.com/).
