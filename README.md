@@ -2,6 +2,14 @@
 
 A searchable, responsive interview preparation site. The interview question bank and sample answers are maintained as Markdown files in `interview-answers/`. The website reads those Markdown files directly, so the Markdown documents are the single source of truth.
 
+## Repository guide
+
+The website includes a **Repository Guide** category with step-by-step instructions for editing existing answers, adding questions or categories, and publishing changes. Read `interview-answers/00-repository-guide.md` before making structural changes.
+
+## Project implementation
+
+The final category, **Project Implementation**, documents end-to-end implementation stories for Copado, GitLab CI/CD, Gearset, GitHub Actions and Azure DevOps. It distinguishes verified hands-on experience from topics that still need project-specific details.
+
 ## Edit locally on your Mac
 
 1. Install [Git](https://git-scm.com/downloads) and [Visual Studio Code](https://code.visualstudio.com/).
