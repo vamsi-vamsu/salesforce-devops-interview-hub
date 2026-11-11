@@ -17,6 +17,14 @@ The final category, **Project Implementation**, documents end-to-end implementat
 
 The Gearset category is based on the provided reference material and the user's confirmation of Gearset experience. Verify any environment-specific details, pipeline counts, integrations and metrics against the actual implementation before using them in an interview.
 
+## Copado interview categories
+
+- **Copado & Release Management:** Core concepts, credentials, User Stories, releases, approvals, integrations, data deployment and release governance.
+- **Copado Source Format Pipelines:** Environment configuration, merge behavior, conflict resolution, Environment Sync, back promotions, Clean Pull Requests, EnVars, data commits and quality gates.
+- **Copado AI & Release Optimization:** Scenario-based recommendations for conflict prevention, release-window improvement, quality gates, back-promotion strategy and troubleshooting. These are proposed approaches, not claims that every recommendation was implemented.
+
+The Copado Source Format category follows the supplied technical reference. Confirm product-version-specific behavior in the installed Copado version. Keep Copado and GitLab project experiences separate.
+
 ## Edit locally on your Mac
 
 1. Install [Git](https://git-scm.com/downloads) and [Visual Studio Code](https://code.visualstudio.com/).
