@@ -265,9 +265,9 @@ Copado does not remove the need for sound Git practices, dependency management o
 
 ## Q: Explain the different environments in your Copado pipeline.
 
-I describe the environments by their purpose and the promotion path rather than only listing org names. A typical lifecycle is Development, Integration or SIT, QA, UAT, Staging and Production. Developers commit changes through User Stories, the release team promotes the approved scope through validation and testing environments, business users complete UAT, and the production deployment is controlled by approvals and a release window. In my Copado implementation, the confirmed scope included four production Salesforce orgs and promotion paths through SIT, UAT and Production. I would map the exact development and intermediate org names to the specific project rather than assume every org follows an identical path.
+I describe the environments by their purpose and the promotion path rather than only listing org names. A typical lifecycle is Development, Integration or SIT, QA, UAT, Staging and Production. Developers commit changes through User Stories, the release team promotes the approved scope through validation and testing environments, business users complete UAT, and the production deployment is controlled by approvals and a release window. In my Copado implementation, the confirmed environment path was multiple Developer Orgs → QA → UAT → Production, with a separate Hotfix org connected to Production. I would map the exact development and intermediate org names to the specific project rather than assume every org follows an identical path.
 
-**[Experience]** Multiple development orgs connected to a shared QA environment first, then UAT and Production, with a Hotfix org tied to production. If your SIT is the same environment as QA, use one name consistently.
+**[Experience]** Multiple development orgs connected to a shared QA environment first, then UAT and Production, with a Hotfix org tied to production. For this project, use QA consistently as the environment name.
 
 ## Q: When do you use back promotion in Copado?
 
@@ -643,7 +643,7 @@ Lead with what you did: reducing the release window, introducing back promotion,
 
 
 
-# Copado AI and Release Optimization
+## Copado AI and Release Optimization
 
 The following answers cover AI-assisted release optimization, conflict prevention, synchronization, rollback considerations and release governance. Treat recommendations as evaluation approaches unless the feature was actually enabled in the project. Verify availability and behavior against the installed Copado version before describing a capability as implemented.
 
