@@ -82,3 +82,16 @@ I first identify which stage failed: Security, scratch-org provisioning, metadat
 
 _Sample answer to be completed. Prepare this using the project context, technical decisions, troubleshooting steps and outcomes relevant to the question. Do not claim experience that you have not personally had._
 
+
+
+## Q: How is Apex PMD integrated into your Salesforce CI/CD process?
+
+Apex PMD is used as a static analysis check to identify code-quality and potential defect patterns in Apex before changes move further through the pipeline. The pipeline runs the configured PMD analysis against the source, captures the findings and makes the results available for review. PMD complements Apex unit tests: it detects rule-based code issues, while tests validate behavior. I would confirm the exact job stage and failure threshold from the current pipeline YAML and ruleset before describing a specific blocking policy.
+
+## Q: Where are PMD findings and Apex coverage results tracked?
+
+The PMD scan output is reviewed as part of code quality checks, and scheduled Apex and package coverage results are published to the GitLab Wiki for team visibility. The GitLab Wiki provides a place to review the latest scheduled results, while the source repository and pipeline configuration preserve the rules and execution process. I distinguish the latest report from a historical result and verify its timestamp before quoting counts or coverage percentages.
+
+## Q: How do you decide whether a PMD finding should block a merge?
+
+I use the team's agreed severity and quality policy rather than treating every finding identically. High-risk findings can be configured to fail the pipeline, while lower-priority findings can be reported for review and remediation. I consider whether the finding is new or pre-existing, the affected code path and the risk of the change. The exact blocking threshold must match the PMD ruleset and pipeline configuration; I do not quote a severity threshold unless I have verified it.
