@@ -4,22 +4,22 @@
 
 ## Q: Walk me through your Copado implementation from development to production.
 
-I implemented Copado release management from the ground up across four production Salesforce orgs. The setup included Salesforce org connections, Git integration, environments, credentials, branch mappings, promotion paths and quality gates, along with Jira and OwnBackup integrations.
+I implemented Copado release management across multiple Salesforce orgs, with multiple Developer Orgs feeding a shared QA environment, followed by UAT and Production. A separate Hotfix org is connected to Production. The setup included Salesforce org connections, Git integration, environments, credentials, branch mappings, promotion paths and quality gates, along with Jira and OwnBackup integrations.
 
-Development work was tracked through Copado User Stories. Developers committed the related metadata, and the changes were validated and promoted through the configured lower environments, including SIT and UAT. We reviewed deployment results, dependencies and conflicts at each stage. Approved changes were consolidated into a release, passed the required approvals and validations, and were deployed to production. After deployment, we performed post-deployment checks and communicated the outcome to stakeholders.
+Development work was tracked through Copado User Stories. Developers committed the related metadata, and the changes were validated and promoted through the configured lower environments, including QA and UAT. We reviewed deployment results, dependencies and conflicts at each stage. Approved changes were consolidated into a release, passed the required approvals and validations, and were deployed to production. After deployment, we performed post-deployment checks and communicated the outcome to stakeholders.
 
-We also handled back-promotions so fixes made in a higher environment, especially production hotfixes, were brought back into the active lower-environment branches and orgs. The process supported approximately 20 to 25 production releases per year.
+We also handled back-promotions so fixes made in a higher environment, especially production hotfixes, were brought back into the active lower-environment branches and orgs. The process supported approximately 20 to 25 production releases per year, consistent with the Copado/Gearset release program.
 
-## Q: How many Salesforce orgs were involved in the Copado implementation?
+## Q: What was the Copado environment architecture?
 
-The Copado implementation covered four production Salesforce orgs. The environment configuration also included the connected development and lower environments used in the promotion path. The exact count of non-production orgs should be stated separately based on the environment inventory rather than inferred from the four production orgs.
+The standard promotion path was multiple Developer Orgs → shared QA → UAT → Production. A separate Hotfix org was connected to Production for urgent fixes. Multiple development teams and orgs fed into the shared QA integration point before changes moved through UAT and production approvals.
 
 ## Q: How many Copado pipelines did you implement, and what was the purpose of each?
 
 Copado was configured around governed promotion paths and release stages rather than being described as a fixed number of independent GitLab-style CI pipelines. The key stages in the implementation were:
 
 1. **Development and User Story capture:** Track the work item, metadata changes and commits associated with the change.
-2. **Promotion to SIT:** Move the selected changes into system integration testing and validate deployment results and dependencies.
+2. **Promotion to QA:** Move the selected changes into the shared QA environment and validate deployment results and dependencies.
 3. **Promotion to UAT:** Promote the approved change set for business or user acceptance testing.
 4. **Production release:** Consolidate approved changes, complete quality gates and approvals, and deploy the release to production.
 5. **Back-promotion and hotfix alignment:** Bring production fixes or higher-environment changes back into lower environments and active branches.
@@ -32,7 +32,7 @@ The implementation included quality gates and approvals to control movement betw
 
 ## Q: Explain your GitLab CI/CD implementation from development to production.
 
-The GitLab implementation supports a Salesforce DX monorepo containing nine second-generation unlocked packages across four Salesforce orgs. We use two long-lived branches, Develop and main. Developers create feature branches from Develop and open merge requests back to Develop.
+The GitLab implementation supports a Salesforce DX monorepo containing nine second-generation unlocked packages across multiple Salesforce orgs. We use two long-lived branches, Develop and main. Developers create feature branches from Develop and open merge requests back to Develop.
 
 The merge-request pipeline performs security checks, provisions a scratch org using the nightly snapshot when available, deploys metadata in dependency order, runs Apex tests and makes the org available to QA. If the merge request title contains `skip-snapshot`, or the nightly snapshot is unavailable, the pipeline uses regular scratch-org creation as a fallback.
 
