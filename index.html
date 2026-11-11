@@ -30,22 +30,34 @@ const MARKDOWN_FILES = ["./interview-answers/01-introduction-project-experience.
 async function loadMarkdownLibrary(){
  const docs=await Promise.all(MARKDOWN_FILES.map(async url=>{const r=await fetch(url);if(!r.ok)throw new Error('Unable to load '+url);return r.text();}));
  DATA=[]; ANSWERS={};
- for(const doc of docs){const lines=doc.split(/\\r?\\n/);let category=(lines.find(x=>x.startsWith('# '))||'# Interview').slice(2).trim();let questions=[];let current='';let body=[];
-  const save=()=>{if(current){questions.push(current);const answer=body.join('\\n').trim();if(answer&&!answer.startsWith('_Sample answer to be completed'))ANSWERS[current]=answer;}};
+ for(const doc of docs){
+  const lines=doc.split(String.fromCharCode(10));
+  const category=(lines.find(x=>x.startsWith('# '))||'# Interview').slice(2).trim();
+  const questions=[];let current='';let body=[];
+  const save=()=>{if(current){questions.push(current);const answer=body.join(String.fromCharCode(10)).trim();if(answer&&!answer.startsWith('_Sample answer to be completed'))ANSWERS[current]=answer;}};
   for(const line of lines){if(line.startsWith('## Q: ')){save();current=line.slice(6).trim();body=[];}else if(current)body.push(line);}
   save();DATA.push({category,questions});
  }
+ total=DATA.reduce((n,c)=>n+c.questions.length,0);
 }
 function markdownToHtml(md){
  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
- return md.trim().split(/\\n\\s*\\n/).map(block=>{const t=block.trim();if(!t)return '';if(t.startsWith('### '))return '<h4>'+esc(t.slice(4))+'</h4>';if(t.startsWith('## '))return '<h3>'+esc(t.slice(3))+'</h3>';if(t.startsWith('- ')||t.startsWith('* '))return '<ul>'+t.split('\\n').map(x=>'<li>'+esc(x.replace(/^[-*]\\s+/,''))+'</li>').join('')+'</ul>';if(/^\\d+\\. /.test(t))return '<ol>'+t.split('\\n').map(x=>'<li>'+esc(x.replace(/^\\d+\\.\\s+/,''))+'</li>').join('')+'</ol>';return '<p>'+esc(t).replace(/\\n/g,'<br>')+'</p>';}).join('');
+ return md.trim().split(String.fromCharCode(10)+String.fromCharCode(10)).map(block=>{
+  const t=block.trim();if(!t)return '';
+  if(t.startsWith('### '))return '<h4>'+esc(t.slice(4))+'</h4>';
+  if(t.startsWith('## '))return '<h3>'+esc(t.slice(3))+'</h3>';
+  const lines=t.split(String.fromCharCode(10));
+  if(lines.every(x=>x.startsWith('- ')||x.startsWith('* ')))return '<ul>'+lines.map(x=>'<li>'+esc(x.slice(2))+'</li>').join('')+'</ul>';
+  if(lines.every(x=>/^\\d+\\. /.test(x)))return '<ol>'+lines.map(x=>'<li>'+esc(x.replace(/^\\d+\\.\\s+/,''))+'</li>').join('')+'</ol>';
+  return '<p>'+esc(t).replaceAll(String.fromCharCode(10),'<br>')+'</p>';
+ }).join('');
 }
 const $ = s => document.querySelector(s);
 const key = 'sf-devops-hub-v1';
 let state = JSON.parse(localStorage.getItem(key)||'{}');
 let active = 'All';
 let expanded = false;
-const total = DATA.reduce((n,c)=>n+c.questions.length,0);
+let total = 0;
 function save(){localStorage.setItem(key,JSON.stringify(state));stats();}
 function stats(){let prepared=0,practice=0;Object.values(state).forEach(v=>{if(v.status==='prepared')prepared++;if(v.status==='practice')practice++;});$('#total').textContent=total;$('#done').textContent=prepared;$('#todo').textContent=practice;$('#progress').style.width=(prepared/total*100)+'%';}
 function id(c,q){return c+'::'+q}
@@ -60,5 +72,5 @@ $('#questions').addEventListener('input',e=>{if(e.target.matches('textarea[data-
 $('#search').addEventListener('input',render);$('#statusFilter').addEventListener('change',render);
 $('#expand').onclick=()=>{expanded=!expanded;$('#expand').textContent=expanded?'Collapse all':'Expand all';render();};
 $('#menu').onclick=()=>$('#sidebar').classList.toggle('show');
-buildNav();render();
+loadMarkdownLibrary().then(()=>{buildNav();render();}).catch(err=>{console.error(err);$('#questions').innerHTML='<div class="empty">Unable to load the Markdown answer library. Refresh the page or check the repository files.</div>';});
 </script></body></html>
