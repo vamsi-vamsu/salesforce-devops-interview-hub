@@ -82,6 +82,24 @@ I assess the production impact and identify the exact metadata changes involved.
 
 Document the actual workflow files, triggers, jobs, reusable workflows, Salesforce authentication method, secrets storage, validation and deployment targets. Explain how pull requests are validated, how changes move between environments, how production approvals are enforced, and how artifacts and deployment results are tracked. Do not assume that the GitLab pipeline design was also implemented in GitHub Actions unless that is confirmed.
 
+## Q: You have worked with Copado, GitLab, Tekton and GitHub Actions. How do you approach Salesforce DevOps architecture?
+
+Throughout my Salesforce DevOps experience, I have worked with different approaches to automating Salesforce development and release management. My experience is not limited to configuring CI/CD tools. I have been involved in designing and implementing the deployment lifecycle.
+
+In Copado, I built the release management framework from scratch. I worked on configuring environments, deployment pipelines, User Story management, promotions, back-promotions, validations and release governance.
+
+In GitLab CI/CD, I built automation around Salesforce DX and package-based development. We worked with a monorepo containing nine second-generation unlocked packages and implemented automated validation and deployment processes.
+
+I also worked on migrating our existing Travis CI pipelines to Tekton, where we automated pull request validation and deployment activities.
+
+Separately, in GitHub Actions, I developed reusable Salesforce deployment workflows, PR validation, Quick Deploy, release/tag-based deployments and custom Python automation.
+
+What I bring across these implementations is an understanding of Salesforce metadata dependencies, source control, branching strategies, release isolation, deployment sequencing, testing and production governance.
+
+I do not believe one CI/CD tool is the answer for every organization. My approach is to understand the Salesforce architecture, development model, release frequency and compliance requirements first, and then design the automation framework around those requirements.
+
+For me, the objective is always the same: predictable deployments, faster release cycles, reduced manual intervention and better control over production changes.
+
 ## Q: How would you describe an Azure DevOps implementation in an interview?
 
 Document the actual Azure Repos or Git integration, pipeline YAML, stages, jobs, service connections, variable groups, secure files, approvals and environment checks. Explain the branch strategy, Salesforce CLI or packaging approach, validation gates, deployment targets and production release controls. Separate hands-on implementation from general Azure DevOps knowledge.
