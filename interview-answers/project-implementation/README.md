@@ -107,3 +107,26 @@ Document the actual Azure Repos or Git integration, pipeline YAML, stages, jobs,
 ## Q: What information should be captured for every DevOps implementation?
 
 For each platform, capture the number and types of Salesforce orgs, repository and branching strategy, number of pipeline flows, trigger for each pipeline, stages and jobs, deployment targets, metadata or package strategy, testing and quality gates, secrets and authentication, approvals, notifications, rollback or hotfix process, and measurable results. Include only details that can be supported by project configuration or direct implementation experience.
+
+
+## Q: How did you use OwnBackup in the Salesforce environment and release process?
+
+We connected our Salesforce orgs to Own using a dedicated integration user in each environment. After connecting an org, we selected the metadata and data to include in the backup configuration.
+
+The platform capabilities we worked with included:
+
+- **Backup:** Configure the Salesforce org connection and select the metadata and data to protect.
+- **Find:** Search for and identify records or metadata that need investigation.
+- **Compare:** Compare metadata or data between Salesforce orgs and review the differences.
+- **Restore:** Recover data or metadata when it has been accidentally deleted or needs to be restored.
+- **Seeding:** Create a template, select the source org and target org, configure the required data, and seed the target environment. For example, we could use Production as the source to populate SIT with selected data.
+- **Anonymize:** Mask sensitive information as part of seeding so lower environments can use realistic data without exposing original sensitive values.
+- **Jobs:** Schedule supported Own operations based on operational requirements and review their execution.
+
+### How does Own support QA?
+
+Own supports QA by helping prepare lower environments with relevant data. A seeding template defines where the data comes from and which target environment receives it. Anonymization helps protect sensitive information when production data is used in non-production environments. Jobs can be used to schedule recurring activities based on the team's refresh and testing needs.
+
+**Interview positioning:** Own complements the Salesforce CI/CD process. Copado and Git-based pipelines manage metadata delivery and release promotion; Own provides backup, comparison, recovery and lower-environment data-management capabilities.
+
+For the detailed feature walkthrough, interview questions and sample answers, see [OwnBackup & Recovery](../12-ownbackup-recovery.md).
