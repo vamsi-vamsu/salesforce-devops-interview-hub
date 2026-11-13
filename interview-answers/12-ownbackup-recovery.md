@@ -1,123 +1,219 @@
 # OwnBackup & Recovery
 
-> Interview preparation notes. Answers distinguish documented implementation experience from conceptual knowledge. Topics outside direct project experience are framed as an approach rather than claimed hands-on delivery.
+> Interview preparation notes. Answers distinguish the hands-on platform activities you have now described from broader product concepts and recommended operational practices.
 >
-> **Honesty note:** none of your documented project experience (Copado pipeline, GitLab 2GP pipeline, sandbox refreshes, Data Loader seeding, GDPR anonymization Apex) involves operating OwnBackup. Every OwnBackup-specific answer below is therefore written as **[Conceptual]** knowledge or **[Approach]**. **[Related experience]** lines point to adjacent work you can truthfully cite (rollback and back promotion in Copado, release rollback planning, data seeding, GDPR controls). If you have in fact used OwnBackup, edit those answers to say so.
-> **Naming:** OwnBackup became Own Company in 2023, Salesforce's acquisition closed in November 2024, and the product is now marketed as **Own from Salesforce**, with Own Recover now called **Salesforce Backup & Recover**. Interviewers may still say "OwnBackup" or "Own Recover", so recognize all three names. Confirm current product names and features on Salesforce's site before the interview.
+> **Experience note:** You have described connecting Salesforce orgs to Own, configuring backup selections, working with Find, Compare and Restore, creating data-seeding templates, selecting source and target orgs, anonymizing seeded data, and scheduling operations through Jobs. Use those as your hands-on examples. For deeper implementation details not yet documented here (such as exact permissions, object-selection rules, relationship handling, masking rules and restore execution controls), describe your actual configuration rather than guessing.
+> **Naming:** The interface in your screenshot is branded Own from Salesforce. Interviewers may still refer to the platform as OwnBackup. Product names and packaging can change, so use the labels visible in the environment you worked with.
 
-## Q: What is OwnBackup?
+## Own platform: feature overview
 
-**[Conceptual]** OwnBackup is a cloud-to-cloud backup and recovery platform for Salesforce (and some other SaaS data), founded in 2015. It takes automated backups of Salesforce data and metadata, lets teams compare backups over time, and supports selective restoration of records. The company later broadened into archiving, sandbox data seeding and masking, and security, renamed itself Own Company in 2023, and was acquired by Salesforce (closed November 2024). Today the products sit under "Own from Salesforce": Backup & Recover (formerly Own Recover), Archive, Data Mask & Seed (sandbox seeding), and security tooling.
+The platform brings together Salesforce backup, discovery, comparison, recovery and sandbox data-management capabilities. The main areas visible in the interface are Backup, Find, Compare, Restore, Seeding, Anonymize and Jobs.
 
-In short: it is the safety net for data, separate from the deployment pipeline.
+### 1. Backup
 
-## Q: How does OwnBackup support Salesforce backup and recovery?
+**[Hands-on experience]**
 
-**[Conceptual]**
+- Connect the Salesforce orgs that need protection to Own.
+- Configure a dedicated integration user in each connected Salesforce environment, with the permissions required by the integration.
+- After the org is connected, choose which Salesforce metadata and data should be included in the backup configuration.
+- Configure the backup scope and schedule based on the environment's requirements.
 
-- **Automated backups:** scheduled (typically daily) and on-demand backups of data, metadata and files, stored outside the Salesforce org so an org-level problem does not take the backup with it. Some editions add higher-frequency protection (continuous data protection) for critical objects.
-- **Monitoring and alerts:** backup status, anomaly and data-change alerts (for example, unusually large deletions or changes) so problems are spotted early.
-- **Compare:** compare a backup with current org data (or two backups) to see exactly which records and fields changed or were deleted.
-- **Selective restore:** restore individual records, specific fields or whole objects rather than rolling back an entire org, with attention to preserving relationships and not overwriting legitimate later changes.
-- **Metadata backup and restore:** backups of configuration so lost or broken metadata can be investigated or recovered.
-- **Seeding and masking:** use backed-up data to populate sandboxes with right-sized, masked test data.
-- **Compliance:** retention policies, encryption and audit trails to support requirements such as GDPR.
+**Interview explanation:** "We connected our Salesforce orgs to Own using a dedicated integration user for each environment. Once the connection was established, we configured the metadata and data that needed to be included in the backup."
 
-**[Related experience]** My Copado pipeline had rollback, org sync and back promotion enabled on every environment, which covers *metadata* recovery; a backup tool covers *data* recovery.
+### 2. Find
 
-## Q: What is the difference between metadata deployment and data backup?
+Find is used to search for and identify Salesforce records or metadata in the available Own data and backup information. It helps narrow down the item you are investigating before deciding whether further comparison or recovery is needed.
 
-- **Metadata deployment** moves *configuration and code* (objects, fields, Apex, flows, permission sets, page layouts) between environments through the pipeline, driven by Git. It is versioned in source control, and a rollback means redeploying a previous version.
-- **Data backup** protects *records and files* (Accounts, Contacts, Opportunities, attachments and so on) that live only in the org. Git and the deployment pipeline do not contain business data, so if records are deleted or corrupted, the pipeline cannot bring them back.
+**Interview explanation:** "If we need to locate a particular record or metadata component, we can use Find to search for it and identify the item we need to investigate."
 
-Two consequences worth stating in an interview: (1) a good rollback plan covers both: redeploy metadata from Git *and* restore any data affected by the release or by the incident; (2) metadata backups from a backup tool are a second safety net, but Git remains the source of truth for configuration.
+### 3. Compare
 
-**[Related experience]** Rollback planning and back promotion in Copado, and version tracking and rollback planning for production releases in the GitLab 2GP project, are the metadata side of this answer.
+Compare supports several comparison scenarios, including:
 
-## Q: How do you restore Salesforce data using OwnBackup?
+- Comparing metadata between Salesforce orgs.
+- Comparing data between orgs or available backup states.
+- Identifying differences that can help with investigation and troubleshooting.
 
-**[Approach]** (conceptual, not claimed hands-on)
+**Interview explanation:** "We use Compare to understand differences between environments. Depending on what we are investigating, we can compare metadata or data and review the differences rather than manually checking each item."
 
-1. **Scope the incident:** what was lost or corrupted (objects, fields, date range, cause), who is affected, and whether the problem is still happening (stop a runaway integration, batch job or bad load first).
-2. **Choose the backup point:** the latest backup *before* the incident; compare it to current data to see precisely what changed.
-3. **Select what to restore:** the smallest sensible set of records and fields; avoid overwriting legitimate later changes.
-4. **Plan the order and relationships:** restore parents before children, include related records, and think about how lookups, master-detail relationships, record owners and record IDs are handled (restored records may get new IDs, so references need care).
-5. **Control automation:** consider the effect of triggers, flows, validation rules, duplicate rules and email alerts during the restore (bypass or pause where appropriate and agreed).
-6. **Rehearse:** run the restore in a sandbox first when time allows, check the results, then run in production under change control and approval.
-7. **Validate and communicate:** reconcile, get owner sign-off and document what was done (see the validation question below).
+### 4. Restore
 
-## Q: How do you recover from accidental record deletion?
+Restore is used when Salesforce data or metadata has been deleted or needs to be recovered to an earlier state.
+
+Typical use cases include:
+
+- Recovering records that were accidentally deleted or changed.
+- Recovering metadata that was deleted or changed unintentionally.
+- Selecting the appropriate backup state and the items that need recovery.
+
+**Interview explanation:** "If data or metadata is accidentally deleted from an org, we can use the Restore capability to recover the required items from the available backup. We first identify what needs to be recovered and then select the appropriate recovery point and scope."
+
+### 5. Seeding
+
+Seeding is used to populate a target Salesforce environment with selected data from a source environment.
+
+**[Hands-on experience]**
+
+1. Create a seeding template.
+2. Select the source Salesforce org that contains the data.
+3. Select the target Salesforce org that needs to receive the data.
+4. Configure the data and objects required for the target environment.
+5. Run the template to seed the target org.
+
+For example, a lower environment such as SIT can be populated using selected data from Production. The screenshot provided shows the Seeding area, including the Templates and Scheduled tabs and examples of templates with different sources, including Production Data and SIT Data.
+
+**Interview explanation:** "We created seeding templates in Own. In the template, we selected the source org where the data should come from and the target org where the data was needed. We could then configure the data required for that environment and execute the template. This helped us populate lower environments with relevant data instead of manually recreating records."
+
+### 6. Anonymize
+
+Anonymize is used with data seeding to mask sensitive information when data is copied into another Salesforce environment.
+
+- Configure anonymization for sensitive fields and data that should not be exposed in the target environment.
+- Apply masking as part of the seeding process, based on the configured rules.
+- Preserve useful test data while reducing exposure of real customer information in non-production environments.
+
+**Interview explanation:** "When we seed data from Production into a lower environment, we use Anonymize to mask sensitive information. That allows the team to work with realistic data for development and testing without exposing the original sensitive values."
+
+Do not claim a particular masking algorithm, field transformation or relationship behavior unless you have confirmed it in the actual template configuration.
+
+### 7. Jobs
+
+Jobs is the area used to schedule and manage supported Own operations.
+
+- Configure schedules based on operational requirements.
+- Schedule supported activities such as backups and seeding.
+- Review job execution and status to understand whether an operation completed or needs investigation.
+
+**Interview explanation:** "Jobs is where we schedule the different Own operations based on our requirements. It gives us a place to manage scheduled activities and review their execution."
+
+## Q: What is the difference between Backup and Seeding?
+
+Backup protects Salesforce data and metadata by capturing copies that can be used for investigation and recovery. Seeding takes selected data from a source org and populates a target org for development, testing or other environment needs.
+
+A backup is primarily for protection and recovery. Seeding is for making useful data available in another environment. Anonymization can be applied during seeding to mask sensitive values.
+
+## Q: How do Backup, Find, Compare and Restore work together?
+
+A practical workflow is:
+
+1. Backup captures the configured Salesforce data and metadata.
+2. Find helps locate the record or metadata component being investigated.
+3. Compare helps identify what differs between the relevant states or environments.
+4. Restore is used to recover the selected data or metadata when recovery is required.
+
+The exact steps depend on the incident and the available backup state.
+
+## Q: How do you seed a Salesforce sandbox with production-like data?
+
+**[Hands-on experience]**
+
+"I create a seeding template, select Production as the source org and the required sandbox as the target org, then configure the data needed by that environment. If the data contains sensitive information, I configure anonymization so those values are masked when the data is seeded. Once the template is ready, I execute it or schedule it through Jobs, depending on the requirement."
+
+## Q: Why is anonymization important when seeding production data?
+
+Production data can contain personally identifiable information and confidential customer or business details. Anonymization helps reduce the risk of exposing that information in lower environments while retaining realistic data structures for development and testing. The specific fields and masking behavior should follow the organization's security and compliance requirements.
+
+## Q: How do you schedule Own operations?
+
+Use Jobs to configure supported operations to run according to the team's requirements. The schedule should reflect the purpose of the activity, the environment, operational windows and the team's data-refresh needs. Monitor execution status and investigate failures rather than assuming a scheduled job completed successfully.
+
+## Q: How does Own fit into a Salesforce DevOps strategy?
+
+Own complements the source-control and deployment toolchain:
+
+- Git and CI/CD manage versioned code and metadata changes and move them through the release process.
+- Backup and Restore provide a recovery path for Salesforce data and metadata.
+- Compare helps investigate differences between orgs or backup states.
+- Seeding helps prepare lower environments with relevant data.
+- Anonymization helps protect sensitive values when production-like data is used outside Production.
+- Jobs supports scheduling and operational management of these activities.
+
+The key distinction is that a deployment pipeline delivers changes, while backup and recovery protect the org if data or metadata needs to be recovered.
+
+## Q: What would you do if a seeding job failed?
 
 **[Approach]**
 
-1. **Act quickly:** deleted records go to the **Recycle Bin**, where they are kept for 15 days (subject to storage-based limits). Confirm current limits in Salesforce Help. If the records are in the bin, an admin or the owner can undelete them, which restores the record with its original ID and, in most cases, its child records.
-2. **If they are not in the bin** (emptied, hard-deleted via the Bulk API, deleted by a user without bin access, or older than the retention period), restore from a **backup** such as OwnBackup/Salesforce Backup & Recover. Salesforce's older Data Recovery Service was retired in 2020, so do not plan around it.
-3. **Find the cause:** who or what deleted the records (user, flow, Apex, integration, data load, mass delete) using the Setup Audit Trail, debug logs and the backup compare view, and stop it recurring.
-4. **Restore with relationships:** parents before children, mind lookups and master-detail relationships, related files and attachments, and automation side effects.
-5. **Validate and prevent:** reconcile counts and sample records, then add guardrails (restricted delete permissions, deletion alerts, approval for mass deletes, backup before every large data operation or release).
+1. Open the job details and identify the failed step and error message.
+2. Check that the source and target org connections are healthy.
+3. Verify the integration user's access and the template's selected objects and data scope.
+4. Check whether the failure is related to data dependencies, required fields, validation rules, automation or target-org constraints.
+5. Correct the underlying issue and rerun the job in accordance with the team's change and data-handling procedures.
+6. Validate that the expected records were created and that sensitive fields were anonymized as intended.
 
-**[Related experience]** The sandbox seeding I did with Data Loader and the data-handling discipline from deployments (backup before change, rollback plan) apply here.
-
-## Q: How does OwnBackup fit into a Salesforce DevOps strategy?
-
-**[Approach]**
-
-- **Before risky changes:** take (or verify the freshness of) a backup before a major release, data migration, mass update or integration go-live, so data can be recovered if something goes wrong. Pair it with the deployment rollback plan.
-- **Release and incident process:** include "data impact and restore plan" in the release checklist and CAB review, and define who can trigger a restore and under what approval.
-- **Sandbox strategy:** use backup data (and Own's Data Mask & Seed, where licensed) to populate sandboxes with right-sized, **masked** data, which supports the GDPR requirement to keep personal data out of non-production environments.
-- **Governance and compliance:** retention, encryption, audit trail and segregation of duties around who can back up and restore, which matches environments with production approval controls and privileged access management.
-- **Resilience testing:** schedule restore rehearsals and record the results; a backup that has never been restored is untested.
-- **Position in the toolchain:** Git plus pipeline (Copado, GitLab CI/CD, Gearset, GitHub Actions) manages *code and configuration*; the backup tool manages *data*. They complement each other rather than overlap.
-
-**[Related experience]** GDPR-regulated environment with production approval controls, privileged access management and segregation of duties; anonymization Apex for sandbox user records; release approvals and CAB for production.
-
-## Q: How do you validate data after restoration?
+## Q: How do you validate data after seeding?
 
 **[Approach]**
 
-1. **Counts:** compare the number of records restored with the number expected from the backup and the compare report, per object.
-2. **Field-level checks:** sample records and compare key fields to the backup (including owner, status, dates and amounts), and confirm no legitimate later changes were overwritten.
-3. **Relationships:** check parent-child and lookup relationships (children per parent, orphans), and related files, notes and attachments.
-4. **Business validation:** run key reports, dashboards or queries and ask data owners to validate representative scenarios.
-5. **Automation side effects:** confirm no unintended emails, integration messages, duplicate records or roll-up distortions were triggered.
-6. **Document and sign off:** record what was restored, from which backup, by whom, the validation results and any exceptions, and close the incident with the business owner.
+1. Confirm the job completed successfully.
+2. Check record counts for the selected objects.
+3. Validate representative records and important field values.
+4. Check parent-child and lookup relationships.
+5. Confirm that anonymization rules were applied to the intended sensitive fields.
+6. Have the QA or business owner verify that the seeded dataset supports the required test scenarios.
+
+## Q: How does Own compare with a Git-based deployment pipeline?
+
+They solve different problems. Git and CI/CD provide source control, review, validation and controlled deployment of metadata. Own provides backup, recovery, comparison and data-seeding capabilities. A mature Salesforce DevOps process can use both: the pipeline manages delivery, and Own provides data protection and environment data-management capabilities.
 
 ---
 
-## Additional questions
+## Broader backup and recovery concepts
 
-## Q: What are the limits of Salesforce's native recovery options without a backup tool?
+The following are useful operational concepts. Treat them as recommended practices unless you have personally configured them in your Own environment.
 
-**[Conceptual]** The Recycle Bin (15 days, limited by storage), Data Export Service (weekly or monthly exports, manual and slow to restore from), and metadata in Git. These do not give automated daily backups, record-level comparison, relationship-aware selective restore or fast recovery at scale, which is the gap a backup product fills. Salesforce also now offers its own native Backup & Recover product (the former Own Recover).
+### Q: How do you approach a Salesforce data restore?
 
-## Q: What would you put in a data restore runbook?
+1. Scope the incident: identify the affected objects, records, fields, time window and cause.
+2. Stop the process causing the issue, such as a faulty integration, batch job or data load.
+3. Identify the appropriate backup point and compare it with the current state.
+4. Select the smallest sensible recovery scope to avoid overwriting valid later changes.
+5. Consider parent-child relationships, lookups, record ownership and references.
+6. Consider automation side effects such as triggers, flows, validation rules and integrations.
+7. Validate restored record counts, field values, relationships and business outcomes.
+8. Document the recovery and obtain the required owner sign-off.
 
-**[Approach]** Roles and approvals; how to declare an incident; how to stop the cause; where backups live and how to identify the right restore point; the step order (scope, compare, select, restore in order, validate); how to handle automation during restore; communication templates; validation checklist; post-incident review; and a schedule for restore drills.
+### Q: How do you recover from accidental record deletion?
 
-## Q: How do you decide RPO and RTO for Salesforce data?
+1. Check whether the records are still available in Salesforce's Recycle Bin and whether they can be undeleted.
+2. If they are not available there, identify the appropriate backup and recovery point.
+3. Investigate the cause of deletion using available audit information, logs and backup comparison.
+4. Restore the required records and consider related records and relationships.
+5. Validate the result and introduce safeguards against repeat incidents.
 
-**[Approach]** Work with the business to set how much data loss is tolerable (RPO) and how quickly service must be restored (RTO) per object or process, then match the backup frequency and restore process to it: daily backups for most data, higher-frequency protection for critical objects, and a tested restore procedure that can meet the RTO.
+Salesforce Recycle Bin behavior and retention limits can vary by circumstance; verify current Salesforce documentation before quoting exact limits.
 
-## Q: How do you handle sensitive data in backups?
+### Q: How do you validate data after restoration?
 
-**[Approach]** Encrypt backups, restrict access with least privilege and audit it, apply retention and deletion policies (including GDPR erasure requests, which need a defined process for removing or masking data in backups where applicable), and never use unmasked backup data for development or testing.
+- Compare restored record counts with the expected scope.
+- Check key fields on representative records.
+- Validate parent-child and lookup relationships.
+- Check related files and other dependent data where applicable.
+- Run relevant reports or queries and ask data owners to validate business scenarios.
+- Confirm that no unintended automation or integration side effects occurred.
+- Record the restore point, scope, operator, validation results and exceptions.
 
-## Q: Can OwnBackup replace a Git-based deployment pipeline?
+### Q: How do you handle sensitive data in backups and lower environments?
 
-**[Conceptual]** No. A backup restores a state; it is not a controlled, reviewable, repeatable path for delivering changes. Use Git and the pipeline for change delivery and the backup for recovery.
+Use least-privilege access, appropriate retention and audit controls, and the organization's encryption and compliance policies. When production-like data is seeded into non-production environments, configure anonymization for sensitive fields and validate the masking results before making the environment available to developers or testers.
 
-## Q: Tell me about a time you had to roll back or recover from a failed change.
+### Q: Can Own replace a Git-based deployment pipeline?
 
-Use a real example. Candidates from your documented experience: a deployment validation failure where an Apex class referenced a field missing in the destination org (you recommitted the field to the user story, re-ran validation and deployed), or the Copado rollback and back-promotion capabilities you enabled. Be clear that these were metadata recoveries; if asked about data recovery, describe your approach.
+No. A backup product helps recover a prior state; it does not replace source control, code review, automated validation or controlled release promotion. Git and the CI/CD pipeline remain responsible for delivering code and metadata changes.
 
-## Likely follow-ups
+## Likely interview follow-ups
 
-- Have you used OwnBackup or Salesforce Backup & Recover? Answer truthfully; if not, say you understand the concepts and describe how you would adopt it.
-- What happens to record IDs when you restore? Restored records may receive new IDs, so relationships and external references must be handled; Recycle Bin undelete preserves IDs.
-- How often should backups run? Driven by RPO: daily for most objects, more often for critical ones, plus a backup before major releases or data operations.
-- What if the backup itself is corrupted or out of date? Hence monitoring, integrity checks and periodic restore tests.
-- How do you restore metadata versus data? Metadata from Git through the pipeline (rollback), data from the backup tool.
+- How do you connect Salesforce orgs to Own?
+- Why use a dedicated integration user for each org?
+- What is the difference between Backup and Seeding?
+- How do you choose the source and target orgs in a seeding template?
+- How do you mask sensitive information during seeding?
+- What is the role of Find compared with Compare?
+- When would you use Restore?
+- How do you schedule backups and seeding operations?
+- How do you investigate a failed job?
+- How do you validate that seeded data is complete and anonymized?
 
-## Be honest about limits
+## Interview positioning
 
-Position yourself as someone who owns release, rollback and environment processes and understands where a data backup tool fits, rather than as an OwnBackup administrator. Recycle Bin limits and product features change, so check Salesforce Help and the current product pages before quoting specifics.
+Lead with the features you have described using: connecting orgs, configuring backup scope, finding and comparing information, restoring data or metadata, creating source-to-target seeding templates, anonymizing data and scheduling jobs. Then explain how those capabilities support release governance, recovery readiness and safe lower-environment testing. Be precise about which configuration details you personally handled and which are broader operational best practices.
